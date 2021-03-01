@@ -1,5 +1,6 @@
 <?php
 
+session_start();
 
 include ('dbconnection.php');
 
@@ -7,9 +8,13 @@ $error = "";
 
 // print_r($_POST);
 
+if (array_key_exists("logout", $_GET)) {
+        
+    unset($_SESSION);    
+    session_destroy();
+    header("Location: index.php");
 
-
-if (array_key_exists("login", $_POST)){
+}elseif (array_key_exists("login", $_POST)){
 
     // $query = "INSERT INTO `product` (`pcode`,`pname`,`price`,`qty`) VALUES ('".mysqli_real_escape_string($link, $_POST['pcode'])."', '".mysqli_real_escape_string($link, $_POST['pname'])."', '".mysqli_real_escape_string($link, $_POST['price'])."', '".mysqli_real_escape_string($link, $_POST['qty'])."')";
 
@@ -43,14 +48,19 @@ if (array_key_exists("login", $_POST)){
         $result = mysqli_query($link, $query);
     
         $row = mysqli_fetch_array($result);
-    
+                    
         if (isset($row)) {
 
             $hashedPassword = $row['password'];
             
             if ($hashedPassword==$_POST['password']){
 
-                header("Location: main.php");
+                // echo ($newid);
+
+                $userid = $row['id'];
+                $_SESSION['id'] = $userid;
+
+                header("Location: productinfo.php");
 
             }else{
                 $error = "That email/password combination could not be found.";
@@ -64,7 +74,6 @@ if (array_key_exists("login", $_POST)){
     // echo ('print this to test');
     }
 
-
 }
 
 
@@ -75,6 +84,7 @@ if (array_key_exists("login", $_POST)){
 
 <html>
     <body>
+    <a href="register.php"><input type="submit" name="register" value="Register"></a>
     <?php echo $error; ?>
         <form method="post">
 
